@@ -6,6 +6,9 @@ slsfiles="$(git diff --name-only origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME | g
 # Test if any sls files have been modified in the merge request
 # If there are, execute the linting type based on the argument that was passed
 if grep -E '\.sls$' <<< "$slsfiles" &>/dev/null; then
+    # Print which SLS files will be linted
+    printf "$1 linting the following files\n$slsfiles\n--\n"
+
     if [[ "$1" == 'jinja' ]]; then
         # jinja linting
         git diff --name-only origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME | grep -E '\.sls$' | xargs j2lint --ignore jinja-statements-indentation --extensions sls
