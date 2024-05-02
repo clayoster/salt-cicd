@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Gather a list of files included in the merge request
+# Gather a list of sls files included in the merge request
 slsfiles="$(git diff --name-only origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME | grep -E '\.sls$')"
 
 # Test if any sls files have been modified in the merge request
@@ -16,10 +16,11 @@ if grep -E '\.sls$' <<< "$slsfiles" &>/dev/null; then
         # salt linting
         git diff --name-only origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME | grep -E '\.sls$' | xargs salt-lint
     elif [[ "$1" == 'yaml' ]]; then
+        # yaml linting
         # strip jinja templating from sls files. yamllint won't work if it is left in place
         while read filename; do
             sed -i -E 's/^\s*\{%.*%}//g' "$filename"
-            done <<< $slsfiles
+        done <<< $slsfiles
         
         # Evaluate sls files
         yamllint --strict $(while read filename; do printf "$filename "; done <<< "$slsfiles")
