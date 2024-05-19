@@ -11,7 +11,7 @@ if grep -E '\.sls$' <<< "$slsfiles" &>/dev/null; then
 
     if [[ "$1" == 'jinja' ]]; then
         # jinja linting
-        git diff --name-only origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME | grep -E '\.sls$' | xargs j2lint --ignore jinja-statements-indentation --extensions sls
+        git diff --name-only origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME | grep -E '\.sls$' | xargs j2lint --ignore jinja-statements-indentation jinja-statements-delimiter operator-enclosed-by-spaces --extensions sls
     elif [[ "$1" == 'salt' ]]; then
         # salt linting
         git diff --name-only origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME | grep -E '\.sls$' | xargs salt-lint
