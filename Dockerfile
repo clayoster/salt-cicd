@@ -1,12 +1,6 @@
 # Use an official Python runtime as a parent image
 FROM python:3.12-alpine
 
-# Set the working directory in the container
-WORKDIR /app
-
-# Copy the current directory contents into the container at /app
-COPY . /app
-
 # Install available updates, dependencies and python packages from requirements.txt
 RUN set -ex \
     && apk upgrade --update --available --no-cache \
