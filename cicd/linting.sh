@@ -19,7 +19,7 @@ if grep -E '\.sls$' <<< "$slsfiles" &>/dev/null; then
         # yaml linting
         # strip jinja templating from sls files. yamllint won't work if it is left in place
         while read filename; do
-            sed -i -E 's/^\s*\{%.*%}//g' "$filename"
+            sed -i -E -e 's/^\h*\{%.*(\n.*(or|and).*){0,6}%\}\h*$//g' -e 's/\{\{.*\}\}//g' "$filename"
         done <<< $slsfiles
         
         # Evaluate sls files
