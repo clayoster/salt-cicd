@@ -17,9 +17,11 @@ if grep -E '\.sls$' <<< "$slsfiles" &>/dev/null; then
         git diff --name-only origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME | grep -E '\.sls$' | xargs salt-lint
     elif [[ "$1" == 'yaml' ]]; then
         # yaml linting
-        # strip jinja templating from sls files. yamllint won't work if it is left in place
+        # Adjust jinja templating before linting sls files or yamllint will throw errors
+        #   jinja statements will have a comment character (#) placed in front of them
+        #   jinja expressions will be replaced with the text 'jinja-expression-replaced'
         while read filename; do
-            sed -i -E -e 's/^\s*\{%.*%}//g' -e 's/\{\{.*\}\}/jinja-expression-replaced/g' "$filename"
+            sed -i -E -e 's/(^\s*(\{%.*|(or|and)\s+(grains|pillar)\[.*|.*%\}).*\s*$)/# \1/g' -e 's/\{\{.*\}\}/jinja-expression-replaced/g' "$filename"
         done <<< $slsfiles
         
         # Evaluate sls files
