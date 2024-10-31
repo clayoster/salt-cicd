@@ -4,6 +4,9 @@ FROM python:3.12-alpine
 # Set the working directory in the container
 WORKDIR /app
 
+# Copy the current directory contents into the container at /app
+COPY . /app
+
 # Copy the files from the scripts directory to /usr/local/bin
 COPY scripts/ /usr/local/bin/
 
