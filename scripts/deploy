@@ -1,0 +1,82 @@
+#!/bin/bash
+
+# Script for triggering an update of the Salt Fileserver via the API
+
+username="$1"
+password="$2"
+eauth="$3"
+api_server="$4"
+
+error='0'
+
+main() {
+    api_fetch_token
+    api_send_command
+    api_logout
+    exit "$error"
+}
+
+alert() {
+    # Print error to stdout
+    printf '%s\n' "$@"
+    error='1'
+}
+
+# Fetch API token with the supplied credentials
+api_fetch_token() {
+    response=$(curl -s -w '|%{http_code}' --location --request POST "https://$api_server/login" \
+        --header 'Accept: application/json' \
+        -d username="$username" \
+        -d password="$password" \
+        -d eauth="$eauth")
+
+    result="$(awk -F'|' '{print $1}' <<< $response)"
+    httpcode="$(awk -F'|' '{print $2}' <<< $response)"
+
+    if [[ $httpcode == '200' ]]; then
+        echo "Successfully received API token"
+        # Map json values to local variables
+        api_token=$(jq -r '.return[].token' <<< $result)
+        # Debugging
+        #echo "file id: $api_token"
+    else
+        alert "Failed to retrieve auth token key from API. (http code: $httpcode)"
+        exit 1
+    fi
+}
+
+# Send the update command
+api_send_command() {
+    response=$(curl -s -w '|%{http_code}' --location --request POST "https://$api_server/" \
+        --header 'Accept: application/json' \
+        --header "X-Auth-Token: $api_token" \
+        -d client="runner" \
+        -d fun="fileserver.update")
+
+    result="$(awk -F'|' '{print $1}' <<< $response)"
+    httpcode="$(awk -F'|' '{print $2}' <<< $response)"
+
+    if [[ $httpcode == '200' ]]; then
+        echo "Successfully updated Salt Fileserver"
+    else
+        alert "Fileserver update command failed. (http code: $httpcode)"
+    fi
+}
+
+# Log out of the API to destroy the token
+api_logout() {
+    response=$(curl -s -w '|%{http_code}' --location --request POST "https://$api_server/logout" \
+        --header 'Accept: application/json' \
+        --header "X-Auth-Token: $api_token")
+
+    result="$(awk -F'|' '{print $1}' <<< $response)"
+    httpcode="$(awk -F'|' '{print $2}' <<< $response)"
+
+    if [[ $httpcode == '200' ]]; then
+        echo "Successfully logged out of the API"
+    else
+        alert "API logout failed (http code: $httpcode)"
+    fi
+}
+
+main
