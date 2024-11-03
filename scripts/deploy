@@ -1,15 +1,19 @@
 #!/bin/bash
 
-# Script for triggering an update of the Salt Fileserver via the API
+# Script for triggering an update of the Salt gitfs fileserver or git_pillar via the API
 
+# Set variables from positional arguments
 username="$1"
 password="$2"
 eauth="$3"
 api_server="$4"
+update_type="$5"
 
+# Set default error level
 error='0'
 
 main() {
+    determine_update_type
     api_fetch_token
     api_send_command
     api_logout
@@ -20,6 +24,18 @@ alert() {
     # Print error to stdout
     printf '%s\n' "$@"
     error='1'
+}
+
+# Set variables based on $update_type
+determine_update_type() {
+    if [[ "$update_type" == 'states' ]]; then
+        gitfs_type="fileserver"
+    elif [[ "$update_type" == 'pillar' ]]; then
+        gitfs_type="git_pillar"
+    else
+        alert "Unexpected value received for update_type ($update_type)"
+        exit 1
+    fi
 }
 
 # Fetch API token with the supplied credentials
@@ -51,15 +67,15 @@ api_send_command() {
         --header 'Accept: application/json' \
         --header "X-Auth-Token: $api_token" \
         -d client="runner" \
-        -d fun="fileserver.update")
+        -d fun="$gitfs_type.update")
 
     result="$(awk -F'|' '{print $1}' <<< $response)"
     httpcode="$(awk -F'|' '{print $2}' <<< $response)"
 
     if [[ $httpcode == '200' ]]; then
-        echo "Successfully updated Salt Fileserver"
+        echo "Successfully ran $gitfs_type.update"
     else
-        alert "Fileserver update command failed. (http code: $httpcode)"
+        alert "The $gitfs_type.update command failed. (http code: $httpcode)"
     fi
 }
 
