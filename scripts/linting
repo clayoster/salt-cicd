@@ -7,14 +7,14 @@ slsfiles="$(git diff --name-only origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME | g
 # If there are, execute the linting type based on the argument that was passed
 if grep -E '\.sls$' <<< "$slsfiles" &>/dev/null; then
     # Print which SLS files will be linted
-    printf "$1 linting the following files\n$slsfiles\n--\n"
+    printf -- "-- $1 linting the following files --\n$slsfiles\n--\n"
 
     if [[ "$1" == 'jinja' ]]; then
         # jinja linting
-        git diff --name-only origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME | grep -E '\.sls$' | xargs j2lint --ignore jinja-statements-indentation jinja-statements-delimiter operator-enclosed-by-spaces --extensions sls
+        echo "$slsfiles" | xargs j2lint --ignore jinja-statements-indentation jinja-statements-delimiter operator-enclosed-by-spaces --extensions sls
     elif [[ "$1" == 'salt' ]]; then
         # salt linting
-        git diff --name-only origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME | grep -E '\.sls$' | xargs salt-lint
+        echo "$slsfiles" | xargs salt-lint
     elif [[ "$1" == 'yaml' ]]; then
         # yaml linting
         # Adjust jinja templating before linting sls files or yamllint will throw errors
