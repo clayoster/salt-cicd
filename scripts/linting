@@ -1,21 +1,49 @@
 #!/bin/bash
 
-# Gather a list of sls files included in the merge request
-slsfiles="$(git diff --name-only origin/$CI_MERGE_REQUEST_TARGET_BRANCH_NAME | grep -E '\.sls$')"
+linting_type="$1"
+linting_scope="$2"
 
-# Test if any sls files have been modified in the merge request
+# Determine linting scope based on positional argument. Two supported arguments:
+#   merge - This will only evaluate files that are included in the merge/pull request
+#   all (default) - This will evaluate all files in the repository with the .sls extension
+if [[ "$linting_scope" == 'merge' ]]; then
+    # Test if the $GITHUB_BASE_REF varible exists (This is Github)
+    if [[ -n "$GITHUB_BASE_REF" ]]; then
+        platform="github"
+        destination_branch="$GITHUB_BASE_REF"
+    # Test if the $CI_MERGE_REQUEST_TARGET_BRANCH_NAME variable exists (This is Gitlab)
+    elif [[ -n "$CI_MERGE_REQUEST_TARGET_BRANCH_NAME" ]]; then
+        platform="gitlab"
+        destination_branch="$CI_MERGE_REQUEST_TARGET_BRANCH_NAME"
+    # If neither of those variables exist, exit the script with an error and print unidentified platform message
+    else
+        echo "CICD platform not recognized. The 'merge' linting scope only works on Github and Gitlab currently."
+        exit 1
+    fi
+    # Ensure the destination branch has been fetched for comparison
+    printf -- "-- Fetching the destination branch for comparison --"
+    git config --global --add safe.directory "$(pwd)" > /dev/null
+    git fetch origin "$destination_branch"
+    # Gather a list of sls files included in the merge request
+    slsfiles="$(git diff --name-only origin/$destination_branch HEAD | grep -E '\.sls$')"
+elif [[ "$linting_scope" == 'all' || "$linting_scope" == '' ]]; then
+    # Gather a list of all sls files included in the repository
+    slsfiles="$(find * -type f -iname '*.sls')"
+fi
+
+# Test if any sls files were found
 # If there are, execute the linting type based on the argument that was passed
 if grep -E '\.sls$' <<< "$slsfiles" &>/dev/null; then
     # Print which SLS files will be linted
-    printf -- "-- $1 linting the following files --\n$slsfiles\n--\n"
+    printf -- "-- $linting_type linting the following files --\n$slsfiles\n--\n"
 
-    if [[ "$1" == 'jinja' ]]; then
+    if [[ "$linting_type" == 'jinja' ]]; then
         # jinja linting
         echo "$slsfiles" | xargs j2lint --ignore jinja-statements-indentation jinja-statements-delimiter operator-enclosed-by-spaces --extensions sls
-    elif [[ "$1" == 'salt' ]]; then
+    elif [[ "$linting_type" == 'salt' ]]; then
         # salt linting
         echo "$slsfiles" | xargs salt-lint
-    elif [[ "$1" == 'yaml' ]]; then
+    elif [[ "$linting_type" == 'yaml' ]]; then
         # yaml linting
         # Adjust jinja templating before linting sls files or yamllint will throw errors
         #   jinja statements will have a comment character (#) placed in front of them
