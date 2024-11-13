@@ -21,7 +21,7 @@ if [[ "$linting_scope" == 'merge' ]]; then
         exit 1
     fi
     # Ensure the destination branch has been fetched for comparison
-    printf -- "-- Fetching the destination branch for comparison --"
+    printf -- "-- Fetching the destination branch for comparison --\n"
     git config --global --add safe.directory "$(pwd)" > /dev/null
     git fetch origin "$destination_branch"
     # Gather a list of sls files included in the merge request
