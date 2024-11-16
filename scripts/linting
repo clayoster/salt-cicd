@@ -17,7 +17,7 @@ if [[ "$linting_scope" == 'merge' ]]; then
         destination_branch="$CI_MERGE_REQUEST_TARGET_BRANCH_NAME"
     # If neither of those variables exist, exit the script with an error and print unidentified platform message
     else
-        echo "CICD platform not recognized. The 'merge' linting scope only works on Github and Gitlab currently."
+        echo "CICD platform not recognized. The 'merge' linting scope only works on Github and Gitlab currently, and only on merge or pull requests."
         exit 1
     fi
     # Ensure the destination branch has been fetched for comparison
