@@ -1,5 +1,7 @@
 # Salt CICD
 
+***(The true source for this repository is located [here](https://github.com/clayoster/salt-cicd))***
+
 This is collection of tools for running CI/CD jobs to test and deploy Salt states and pillar files.
 
 Container images are based on Alpine Linux and include the following tools:
@@ -20,10 +22,3 @@ In the future I'm planning to add an argument that will allow a choice between t
 - Add choice between linting just the changed files in the current branch or all sls files in the repository
 - Add example gitlab-ci.yml file (and Github Actions?)
 - Add suggsted yamllint and salt-lint dotfiles
-
-
-Many improvements needed here! Update info above as I've added the merge/all linting functionality!
-
-Add example gitlab and github CICD files!
-
-Improve all of the things!
