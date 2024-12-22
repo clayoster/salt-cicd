@@ -16,7 +16,7 @@ main() {
     determine_update_type
     api_fetch_token
     api_send_command
-    api_logout
+    #api_logout
     exit "$error"
 }
 
