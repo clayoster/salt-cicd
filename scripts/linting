@@ -25,35 +25,40 @@ if [[ "$linting_scope" == 'merge' ]]; then
     git config --global --add safe.directory "$(pwd)" > /dev/null
     git fetch origin "$destination_branch"
     # Gather a list of sls files included in the merge request
-    slsfiles="$(git diff --name-only origin/$destination_branch HEAD | grep -E '\.sls$')"
+    slsfiles_merge="$(git diff --name-only origin/$destination_branch HEAD | grep -E '\.sls$')"
+
+    # Confirm that the files found by git diff exist. If there are files that have been added or
+    # deleted in the target branch of the merge/pull request, they will cause errors (usually with yamllint)
+    while read file; do
+        [[ -e "$file" ]] && slsfiles+=("$file")
+    done <<< "$slsfiles_merge"
+
 elif [[ "$linting_scope" == 'all' || "$linting_scope" == '' ]]; then
     # Gather a list of all sls files included in the repository
-    slsfiles="$(find * -type f -iname '*.sls')"
+    slsfiles=("$(find * -type f -iname '*.sls')")
 fi
 
 # Test if any sls files were found
 # If there are, execute the linting type based on the argument that was passed
-if grep -E '\.sls$' <<< "$slsfiles" &>/dev/null; then
+if printf "%s\n" "${slsfiles[@]}" | grep -E '\.sls$' &>/dev/null; then
     # Print which SLS files will be linted
-    printf -- "-- $linting_type linting the following files --\n$slsfiles\n--\n"
+    printf -- "-- $linting_type linting the following files --\n$(printf "%s\n" "${slsfiles[@]}")\n--\n"
 
     if [[ "$linting_type" == 'jinja' ]]; then
         # jinja linting
-        echo "$slsfiles" | xargs j2lint --ignore jinja-statements-indentation jinja-statements-delimiter operator-enclosed-by-spaces --extensions sls
+        printf "%s\n" "${slsfiles[@]}" | xargs -r j2lint --ignore jinja-statements-indentation jinja-statements-delimiter operator-enclosed-by-spaces --extensions sls
     elif [[ "$linting_type" == 'salt' ]]; then
         # salt linting
-        echo "$slsfiles" | xargs salt-lint
+        printf "%s\n" "${slsfiles[@]}" | xargs -r salt-lint
     elif [[ "$linting_type" == 'yaml' ]]; then
         # yaml linting
         # Adjust jinja templating before linting sls files or yamllint will throw errors
         #   jinja statements will have a comment character (#) placed in front of them
         #   jinja expressions will be replaced with the text 'jinja-expression-replaced'
-        while read filename; do
-            sed -i -E -e 's/(^\s*(\{%.*|(or|and)\s+(grains|pillar)\[.*|.*%\}).*\s*$)/# \1/g' -e 's/\{\{.*\}\}/jinja-expression-replaced/g' "$filename"
-        done <<< $slsfiles
+        printf "%s\n" "${slsfiles[@]}" | xargs -r sed -i -E -e 's/(^\s*(\{%.*|(or|and)\s+(grains|pillar)\[.*|.*%\}).*\s*$)/# \1/g' -e 's/\{\{.*\}\}/jinja-expression-replaced/g'
         
         # Evaluate sls files
-        yamllint --strict $(while read filename; do printf "$filename "; done <<< "$slsfiles")
+        printf "%s\n" "${slsfiles[@]}" | xargs -r yamllint --strict
     else
        echo "The argument that was passed to the script did not match any linting types"
     fi
