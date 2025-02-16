@@ -1,0 +1,23 @@
+---
+# Documentation: https://yamllint.readthedocs.io
+extends: default
+
+rules:
+  braces: disable
+  comments:
+    min-spaces-from-content: 1
+    require-starting-space: false
+  comments-indentation: disable
+  document-start: disable
+  empty-lines: disable
+  indentation:
+    spaces: 2
+    indent-sequences: true
+    check-multi-line-strings: false
+  # Duplicated keys can be expected with jinja templating
+  key-duplicates: disable
+  line-length: disable
+  trailing-spaces: disable
+  truthy:
+    allowed-values: ['true', 'True', 'false', 'False']
+    level: warning

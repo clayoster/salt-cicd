@@ -1,0 +1,40 @@
+default:
+  tags:
+    - docker
+
+variables:
+  SALT_CICD_CONTAINER: "ghcr.io/clayoster/salt-cicd:latest"
+
+stages:
+  - test
+  - deploy
+
+jinja-lint-job:
+  stage: test
+  image: $SALT_CICD_CONTAINER
+  #allow_failure: true
+  only:
+    - merge_requests
+  script:
+    - linting jinja merge
+
+yaml-lint-job:
+  stage: test
+  image: $SALT_CICD_CONTAINER
+  allow_failure:
+    exit_codes:
+      - 2 # This means 'warning' in yamllint
+  only:
+    - merge_requests
+  script:
+    - linting yaml merge
+
+# The deploy stage requires the setup of the Salt API to allow access to the following runner
+# modules as well as the appropriate CI/CD variables to be set for the positional arguments.
+#   fileserver.update
+#   git_pillar.update
+gitfs-update:
+  stage: deploy
+  image: $SALT_CICD_CONTAINER
+  script:
+    - deploy "$saltapi_user" "$saltapi_pass" "$saltapi_eauth" "$saltapi_server" pillar

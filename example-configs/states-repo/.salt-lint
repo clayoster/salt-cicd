@@ -1,0 +1,7 @@
+---
+# Documentation: https://salt-lint.readthedocs.io
+skip_list:
+  - 201
+  - 204
+  - 207
+  - 208
