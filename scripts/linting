@@ -1,9 +1,29 @@
 #!/bin/bash
 
-linting_type="$1"
-linting_scope="$2"
+# Display the help text
+show_help() {
+cat <<HELP
+Usage: linting [option]
 
-# Determine linting scope based on positional argument. Two supported arguments:
+Options:
+  -s    Set the linting "scope" (merge | all). If unset this will default to all
+  -c    Set the linting "type" (jinja | salt | yaml)
+  -h    Show this help text
+
+HELP
+}
+
+# Read in arguments to set linting options
+while getopts "hs:t:" option; do
+    case "$option" in
+        h) show_help;;
+        s) linting_scope="$OPTARG" ;;
+        t) linting_type="$OPTARG" ;;
+        *) show_help;;
+    esac
+done
+
+# Determine linting scope based on specified options. Two supported scopes:
 #   merge - This will only evaluate files that are included in the merge/pull request
 #   all (default) - This will evaluate all files in the repository with the .sls extension
 if [[ "$linting_scope" == 'merge' ]]; then

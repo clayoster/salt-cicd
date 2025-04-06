@@ -16,7 +16,7 @@ salt-lint-job:
   only:
     - merge_requests
   script:
-    - linting salt merge
+    - linting -t salt -s merge
 
 jinja-lint-job:
   stage: test
@@ -25,7 +25,7 @@ jinja-lint-job:
   only:
     - merge_requests
   script:
-    - linting jinja merge
+    - linting -t jinja -s merge
 
 yaml-lint-job:
   stage: test
@@ -36,7 +36,7 @@ yaml-lint-job:
   only:
     - merge_requests
   script:
-    - linting yaml merge
+    - linting -t yaml -s merge
 
 # The deploy stage requires the setup of the Salt API to allow access to the following runner
 # modules as well as the appropriate CI/CD variables to be set for the positional arguments.
@@ -46,4 +46,4 @@ gitfs-update:
   stage: deploy
   image: $SALT_CICD_CONTAINER
   script:
-    - deploy "$saltapi_user" "$saltapi_pass" "$saltapi_eauth" "$saltapi_server" states
+    - deploy -u "$saltapi_user" -p "$saltapi_pass" -e "$saltapi_eauth" -s "$saltapi_server" -t states

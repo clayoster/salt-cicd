@@ -2,12 +2,34 @@
 
 # Script for triggering an update of the Salt gitfs fileserver or git_pillar via the API
 
-# Set variables from positional arguments
-username="$1"
-password="$2"
-eauth="$3"
-api_server="$4"
-update_type="$5"
+# Display the help text
+show_help() {
+cat <<HELP
+Usage: linting [option]
+
+Options:
+  -e    Set the eauth type (pam | ldap)
+  -h    Show this help text
+  -p    Set the authentication password
+  -s    Set the API server and port (ex: salt.example.com:8443)
+  -t    Set the update type (states | pillar)
+  -u    Set the authentication username
+
+HELP
+}
+
+# Read in arguments to set API options
+while getopts "e:hp:s:t:u:" option; do
+    case "$option" in
+        e) eauth="$OPTARG" ;;
+        h) show_help;;
+        p) password="$OPTARG" ;;
+        s) api_server="$OPTARG" ;;
+        t) update_type="$OPTARG" ;;
+        u) username="$OPTARG" ;;
+        *) show_help;;
+    esac
+done
 
 # Set default error level
 error='0'

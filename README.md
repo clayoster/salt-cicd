@@ -16,11 +16,27 @@ Currently, this container is designed to be used with Gitlab CI/CD running on me
 
 In the future I'm planning to add an argument that will allow a choice between testing the files changed in the current branch or all of the files matching '*.sls' in the entire repository being tested. This will make the project a little more useful for projects hosted on Github.
 
-# Example Configurations
+# CLI Examples
+
+Linting Script 
+```bash
+# Lint only the .sls files included in a merge request with salt-lint
+linting -t salt -s merge
+
+# Lint all .sls files in the repository with yamllint
+linting -t yaml -s all
+```
+Deploy Script (Triggering gitfs updates via Salt API)
+```bash
+# Update the Salt Fileserver (salt-run fileserver.update) via API
+deploy -u "$saltapi_user" -p "$saltapi_pass" -e "$saltapi_eauth" -s "$saltapi_server" -t states
+
+# Update Salt Pillar (salt-run git_pillar.update) via API
+deploy -u "$saltapi_user" -p "$saltapi_pass" -e "$saltapi_eauth" -s "$saltapi_server" -t pillar
+```
+
+# Example Gitlab CI/CD Configurations
 Example configurations for Gitlab CI/CD and yamllint/salt-lint configs can be found in the `example-configs` directory.
 
 # Todo
-- Improve arguments and input validation for deploy and linting scripts
-- Add documentation for how to actually use the scripts included in the container
-- Add choice between linting just the changed files in the current branch or all sls files in the repository
 - Add example Github Actions configuration
