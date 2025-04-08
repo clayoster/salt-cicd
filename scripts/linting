@@ -83,6 +83,6 @@ if printf "%s\n" "${slsfiles[@]}" | grep -E '\.sls$' &>/dev/null; then
        echo "The argument that was passed to the script did not match any linting types"
     fi
 else
-    echo "No sls files found, skipping $1 linting"
+    echo "No sls files found, skipping $linting_type linting"
     exit 0
 fi
