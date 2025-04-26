@@ -30,7 +30,7 @@ yaml-lint-job:
     - linting -t yaml -s merge
 
 # The deploy stage requires the setup of the Salt API to allow access to the following runner
-# modules as well as the appropriate CI/CD variables to be set for the positional arguments.
+# modules as well as the appropriate CI/CD variables to be set for the command arguments.
 #   fileserver.update
 #   git_pillar.update
 gitfs-update:

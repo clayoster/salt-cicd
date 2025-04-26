@@ -18,7 +18,11 @@ In the future I'm planning to add an argument that will allow a choice between t
 
 # CLI Examples
 
-Linting Script 
+### Linting Script
+ - `-t` takes a single argument of "jinja", "salt", or "yaml"
+ - `-s` takes a single argument of "merge" or "all"
+   - `merge` will only test the .sls files modified in the merge/pull request
+   - `all` will test all .sls files within the repository
 ```bash
 # Lint only the .sls files included in a merge request with salt-lint
 linting -t salt -s merge
@@ -26,7 +30,11 @@ linting -t salt -s merge
 # Lint all .sls files in the repository with yamllint
 linting -t yaml -s all
 ```
-Deploy Script (Triggering gitfs updates via Salt API)
+### Deploy Script (Triggers gitfs updates via the Salt API)
+The deploy script requires the setup of the Salt API to allow access to the following runner
+modules
+  - fileserver.update
+  - git_pillar.update
 ```bash
 # Update the Salt Fileserver (salt-run fileserver.update) via API
 deploy -u "$saltapi_user" -p "$saltapi_pass" -e "$saltapi_eauth" -s "$saltapi_server" -t states
