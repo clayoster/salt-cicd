@@ -40,3 +40,6 @@ Example configurations for Gitlab CI/CD and yamllint/salt-lint configs can be fo
 
 # Todo
 - Add example Github Actions configuration
+- Add functions to linting and deploy scripts
+- Add a note to the docs about yaml linting intentionally adding comments in front of jinja lines
+- Add CI/CD tests to automate testing of linting (and possibly deploy) scripts
