@@ -1,0 +1,22 @@
+name: Deploy
+
+# The deploy job requires the setup of the Salt API to allow access to the following runner
+# modules as well as the appropriate CI/CD secrets to be set for the command arguments.
+#   fileserver.update
+#   git_pillar.update
+
+on: push
+
+jobs:
+  gitfs-update:
+    name: GitFS Update
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/clayoster/salt-cicd:latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy with Salt API
+        run: |
+          deploy -u "${{ secrets.SALTAPI_USER }}" -p "${{ secrets.SALTAPI_PASS }}" -e "${{ secrets.SALTAPI_EAUTH }}" -s "${{ secrets.SALTAPI_SERVER }}" -t states

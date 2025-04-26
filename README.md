@@ -35,11 +35,10 @@ deploy -u "$saltapi_user" -p "$saltapi_pass" -e "$saltapi_eauth" -s "$saltapi_se
 deploy -u "$saltapi_user" -p "$saltapi_pass" -e "$saltapi_eauth" -s "$saltapi_server" -t pillar
 ```
 
-# Example Gitlab CI/CD Configurations
-Example configurations for Gitlab CI/CD and yamllint/salt-lint configs can be found in the `example-configs` directory.
+# Example CI/CD Configurations
+Example configurations for Gitlab CI/CD, Github Actions and yamllint/salt-lint configs can be found in the `example-configs` directory.
 
 # Todo
-- Add example Github Actions configuration
 - Add functions to linting and deploy scripts
 - Add a note to the docs about yaml linting intentionally adding comments in front of jinja lines
 - Add CI/CD tests to automate testing of linting (and possibly deploy) scripts

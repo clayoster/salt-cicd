@@ -1,0 +1,20 @@
+name: Linting
+
+on: pull_request
+
+jobs:
+  lint-jobs:
+    name: Lint ${{ matrix.type }}
+    runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/clayoster/salt-cicd:latest
+    strategy:
+      matrix:
+        type: [jinja, yaml]
+    continue-on-error: true
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Linting
+        run: linting -t ${{ matrix.type }} -s merge
