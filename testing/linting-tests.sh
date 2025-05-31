@@ -13,12 +13,13 @@ cp -prf testing/files /tmp/
 # YAML tests have to run last as they will comment out jinja templating lines
 while IFS='|' read -r type filename; do
     #printf -- "-- $type linting $filename --\n"
-    if ! bash scripts/linting -t "$type" -s single -f "/tmp/files/$filename" ; then
-        #echo "Successful"
-    #else
-        #echo "Failed"
+    if bash scripts/linting -t "$type" -s single -f "/tmp/files/$filename" ; then
+        echo "Test Succeeded"
+    else
+        echo "Test Failed"
         test_failed="1"
     fi
+    printf -- "\n"
 done <<EOF
 jinja|good.sls
 salt|good.sls
@@ -29,12 +30,13 @@ EOF
 # YAML tests have to run last as they will comment out jinja templating lines
 while IFS='|' read -r type filename expected_error; do
     printf -- "-- $type linting $filename, looking for \"$expected_error\" --\n"
-    if ! bash scripts/linting -t "$type" -s single -f "/tmp/files/$filename" | grep "$expected_error"; then
-        #echo "Successful"
-    #else
-        #echo "Failed"
+    if bash scripts/linting -t "$type" -s single -f "/tmp/files/$filename" | grep "$expected_error" >/dev/null; then
+        echo "Test Succeeded"
+    else
+        echo "Test Failed"
         test_failed="1"
     fi
+
     printf -- "\n"
 done <<EOF
 jinja|jinja-bad.sls|jinja-statements-single-space
