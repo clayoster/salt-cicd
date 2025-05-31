@@ -49,4 +49,3 @@ Example configurations for Gitlab CI/CD, Github Actions and yamllint/salt-lint c
 # Todo
 - Add functions to linting and deploy scripts
 - Add a note to the docs about yaml linting intentionally adding comments in front of jinja lines
-- Add CI/CD tests to automate testing of linting (and possibly deploy) scripts
