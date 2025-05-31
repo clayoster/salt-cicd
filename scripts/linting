@@ -6,25 +6,28 @@ cat <<HELP
 Usage: linting [option]
 
 Options:
-  -s    Set the linting "scope" (merge | all). If unset this will default to all
-  -c    Set the linting "type" (jinja | salt | yaml)
+  -f    Set the file to be linted (only used with a linting scope of "single")
+  -s    Set the linting "scope" ( merge | single | all ). If unset this will default to all
+  -t    Set the linting "type" ( jinja | salt | yaml )
   -h    Show this help text
 
 HELP
 }
 
 # Read in arguments to set linting options
-while getopts "hs:t:" option; do
+while getopts "f:hs:t:" option; do
     case "$option" in
-        h) show_help;;
+        f) linting_file="$OPTARG" ;;
+        h) show_help ;;
         s) linting_scope="$OPTARG" ;;
         t) linting_type="$OPTARG" ;;
-        *) show_help;;
+        *) show_help ;;
     esac
 done
 
 # Determine linting scope based on specified options. Two supported scopes:
 #   merge - This will only evaluate files that are included in the merge/pull request
+#   single - This will only evaluate a single file (specified with the -f argument)
 #   all (default) - This will evaluate all files in the repository with the .sls extension
 if [[ "$linting_scope" == 'merge' ]]; then
     # Test if the $GITHUB_BASE_REF varible exists (This is Github)
@@ -52,6 +55,15 @@ if [[ "$linting_scope" == 'merge' ]]; then
     while read file; do
         [[ -e "$file" ]] && slsfiles+=("$file")
     done <<< "$slsfiles_merge"
+
+elif [[ "$linting_scope" == 'single' ]]; then
+    if [[ -n "$linting_file" ]]; then
+        # Use the file path provided by the -f argument
+        slsfiles=("$linting_file")
+    else
+        echo "Linting file (-f option) was not specified"
+        exit 1
+    fi
 
 elif [[ "$linting_scope" == 'all' || "$linting_scope" == '' ]]; then
     # Gather a list of all sls files included in the repository
