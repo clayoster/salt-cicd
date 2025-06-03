@@ -57,6 +57,3 @@ deploy -u "$saltapi_user" -p "$saltapi_pass" -e "$saltapi_eauth" -s "$saltapi_se
 Example configurations for Gitlab CI/CD, Github Actions and yamllint/salt-lint configs can be found in the `example-configs` directory.
 
 I have primarily used this project to only lint the files that are included in merge or pull requests. However, it can certainly be set up to evaluate all sls files in a repository upon any commit to the repository.
-
-# Todo
-- Add functions to the linting script
