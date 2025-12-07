@@ -2,7 +2,7 @@ name: Scan Latest Image With Trivy (Weekly)
 on:
   schedule:
     #- cron: "0 6 * * 6"   # Saturdays at 06:00 UTC
-    - cron: "23 21 * * 0"   # Testing
+    - cron: "* 21 * * 0"   # Testing
   pull_request:
 jobs:
   trivy-scan:
