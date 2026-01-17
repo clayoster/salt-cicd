@@ -12,7 +12,30 @@ Container images are based on Alpine Linux and include the following tools:
   - [yamllint](https://github.com/adrienverge/yamllint)
   - [salt-lint](https://github.com/warpnet/salt-lint)
 
-# CLI Examples
+## Example CI/CD Configurations
+Example configurations for Gitlab CI/CD, Github Actions and yamllint/salt-lint configs can be found in the `example-configs` directory.
+
+I have primarily used this project to only lint the files that are included in merge or pull requests. However, it can certainly be set up to evaluate all sls files in a repository upon any commit to the repository.
+
+## Disabling yamllint for individual files
+Some files will not play nice with yamllint due to how Jinja templating is used with them. To disable yammlint for the entire file, add this line as the first line of the file
+
+```yaml
+# yamllint disable
+```
+
+You can also use the following configuration in the `.yamllint` configuration file to ignore files or folders
+
+```yaml
+ignore: |
+  path/to/*/ignored/folder/
+  path/to/ignored-file.sls
+```
+
+More Documentation on how to disable yammllint checks within files:
+https://yamllint.readthedocs.io/en/stable/disable_with_comments.html
+
+## CLI Examples
 
 ### Linting Script
 
@@ -84,26 +107,3 @@ rest_cherrypy:
         - '10.0.0.80' # git-runner1.example.com
         - '10.0.0.81' # git-runner2.example.com
 ```
-
-# Example CI/CD Configurations
-Example configurations for Gitlab CI/CD, Github Actions and yamllint/salt-lint configs can be found in the `example-configs` directory.
-
-I have primarily used this project to only lint the files that are included in merge or pull requests. However, it can certainly be set up to evaluate all sls files in a repository upon any commit to the repository.
-
-# Disabling yamllint for individual files
-Some files will not play nice with yamllint due to how Jinja templating is used with them. To disable yammlint for the entire file, add this line as the first line of the file
-
-```yaml
-# yamllint disable
-```
-
-You can also use the following configuration in the `.yamllint` configuration file to ignore files or folders
-
-```yaml
-ignore: |
-  path/to/*/ignored/folder/
-  path/to/ignored-file.sls
-```
-
-More Documentation on how to disable yammllint checks within files:
-https://yamllint.readthedocs.io/en/stable/disable_with_comments.html
