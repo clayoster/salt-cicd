@@ -39,8 +39,7 @@ Considerations:
   - YAML linting will introduce comment characters in front of jinja templating lines in the sls files being evaluated so it is best to keep it in a separate job. This is necessary as yamllint will throw errors about the templating lines. Comment characters are used instead of deleting the lines to preserve the line numbers of the code. 
 
 ### Deploy Script (Triggers gitfs updates via the Salt API)
-The deploy script requires the setup of the Salt API to allow access to the following runner
-modules
+The deploy script requires the setup of the Salt API (see example below) to allow access to the following runner modules
   - fileserver.update
   - git_pillar.update
 
@@ -51,6 +50,39 @@ deploy -u "$saltapi_user" -p "$saltapi_pass" -e "$saltapi_eauth" -s "$saltapi_se
 
 # Update Salt Pillar (salt-run git_pillar.update) via API
 deploy -u "$saltapi_user" -p "$saltapi_pass" -e "$saltapi_eauth" -s "$saltapi_server" -t pillar
+```
+
+## Example Salt API Configuration for the Deploy Script
+*Ensure the salt-api package is installed on the Salt Master*
+
+This will configure the Salt API to receive connections on the Salt Master's IP on port 8443. It assumes that LDAP is already configured for the Master and the `saltapi_gitlab` user exists in the directory. The configuration only allows two Gitlab runner servers (10.0.0.80 and 10.0.0.81) to access the API.
+
+```yaml
+# /etc/salt/master.d/master.conf
+
+# External Authentication
+external_auth:
+  ldap:
+    'saltapi_gitlab':
+      - '@runner':
+        - 'fileserver.update'
+        - 'git_pillar.update'
+
+# Enable the netapi client interfaces
+netapi_enable_clients:
+  - runner
+
+# Salt API Configuration
+rest_cherrypy:
+  host: 0.0.0.0
+  port: 8443
+  ssl_crt: /etc/ssl/certs/certificate.crt
+  ssl_key: /etc/ssl/private/certificate.key
+  api_acl:
+    users:
+      saltapi_gitlab:
+        - '10.0.0.80' # git-runner1.example.com
+        - '10.0.0.81' # git-runner2.example.com
 ```
 
 # Example CI/CD Configurations
