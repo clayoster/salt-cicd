@@ -93,8 +93,16 @@ I have primarily used this project to only lint the files that are included in m
 # Disabling yamllint for individual files
 Some files will not play nice with yamllint due to how Jinja templating is used with them. To disable yammlint for the entire file, add this line as the first line of the file
 
-```
+```yaml
 # yamllint disable
+```
+
+You can also use the following configuration in the `.yamllint` configuration file to ignore files or folders
+
+```yaml
+ignore: |
+  path/to/*/ignored/folder/
+  path/to/ignored-file.sls
 ```
 
 More Documentation on how to disable yammllint checks within files:
