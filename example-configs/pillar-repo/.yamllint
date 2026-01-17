@@ -2,6 +2,14 @@
 # Documentation: https://yamllint.readthedocs.io
 extends: default
 
+# File extensions to lint
+yaml-files:
+  - "*.sls"
+
+# Ignore specific files or directories
+#ignore: |
+#  path/to/*/ignored/files/
+
 rules:
   braces: disable
   comments:
