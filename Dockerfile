@@ -1,5 +1,8 @@
+################
+## Base Stage ##
+################
 # Use an official Python runtime as a parent image
-FROM python:3.13-alpine
+FROM python:3.13-alpine AS base
 
 # Set the working directory in the container
 WORKDIR /app
@@ -18,3 +21,19 @@ RUN set -ex \
     && chmod +x scripts/* \
     && cp scripts/* /usr/local/bin/ \
     && rm -rf /app/* \
+    && adduser -D app
+
+###############
+## Dev Stage ##
+###############
+FROM base AS dev
+
+# Stop here for development work
+
+################
+## Prod Stage ##
+################
+FROM base AS prod
+
+# Run the container as the non-root user 'app'
+USER app

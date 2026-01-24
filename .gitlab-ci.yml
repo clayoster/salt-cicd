@@ -13,13 +13,19 @@ build:
     # Determine if the tag is a release version (0.0.0 / v0.0.0) or a pre-release (0.0.0-dev / v0.0.0-dev)
     if [[ "$CI_COMMIT_TAG" =~ ^[vV]*[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
       # Push both the specific version tag and the latest tag for release versions
-      /kaniko/executor --context "${CI_PROJECT_DIR}" \
-                       --dockerfile "${CI_PROJECT_DIR}/Dockerfile" \
-                       --destination "${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}" \
-                       --destination "${CI_REGISTRY_IMAGE}:latest"
+      /kaniko/executor \
+        --skip-unused-stages \
+        --target "prod" \
+        --context "${CI_PROJECT_DIR}" \
+        --dockerfile "${CI_PROJECT_DIR}/Dockerfile" \
+        --destination "${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}" \
+        --destination "${CI_REGISTRY_IMAGE}:latest"
     else
       # Push only the specific version tag for pre-release versions
-      /kaniko/executor --context "${CI_PROJECT_DIR}" \
-                       --dockerfile "${CI_PROJECT_DIR}/Dockerfile" \
-                       --destination "${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}"
+      /kaniko/executor \
+        --skip-unused-stages \
+        --target "prod" \
+        --context "${CI_PROJECT_DIR}" \
+        --dockerfile "${CI_PROJECT_DIR}/Dockerfile" \
+        --destination "${CI_REGISTRY_IMAGE}:${CI_COMMIT_TAG}"
     fi
