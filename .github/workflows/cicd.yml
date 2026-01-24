@@ -22,7 +22,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install --no-cache-dir -r requirements.txt
 
-      - name: Run pytest
+      - name: Run linting tests
         run: |
           bash testing/linting-tests.sh
 
