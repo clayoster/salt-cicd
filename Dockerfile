@@ -15,6 +15,6 @@ RUN set -ex \
     && rm -rf /var/cache/apk/* \
     && pip install --no-cache-dir -r requirements.txt \
     && pip cache purge \
+    && chmod +x scripts/* \
     && cp scripts/* /usr/local/bin/ \
     && rm -rf /app/* \
-    && chmod +x /usr/local/bin/*

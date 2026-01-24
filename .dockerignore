@@ -1,0 +1,6 @@
+# Ignore everything by default
+**
+
+# Allow only what the image build process needs
+!requirements.txt
+!scripts/
