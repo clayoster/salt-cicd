@@ -48,7 +48,7 @@ if [[ "$linting_scope" == 'merge' ]]; then
     git config --global --add safe.directory "$(pwd)" > /dev/null
     git fetch origin "$destination_branch"
     # Gather a list of sls files included in the merge request
-    slsfiles_merge="$(git diff --name-only origin/$destination_branch HEAD | grep -E '\.sls$')"
+    slsfiles_merge="$(git diff --name-only origin/$destination_branch HEAD | grep -E '\.sls$' | sort)"
 
     # Confirm that the files found by git diff exist. If there are files that have been added or
     # deleted in the target branch of the merge/pull request, they will cause errors (usually with yamllint)
@@ -67,7 +67,7 @@ elif [[ "$linting_scope" == 'single' ]]; then
 
 elif [[ "$linting_scope" == 'all' || "$linting_scope" == '' ]]; then
     # Gather a list of all sls files included in the repository
-    slsfiles=("$(find * -type f -iname '*.sls')")
+    slsfiles=("$(find * -type f -iname '*.sls' | sort)")
 fi
 
 # Test if any sls files were found
