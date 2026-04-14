@@ -21,7 +21,7 @@ RUN set -ex \
     && chmod +x scripts/* \
     && cp scripts/* /usr/local/bin/ \
     && rm -rf /app/* \
-    && adduser -D app
+    && adduser -D -u 1234 app
 
 ###############
 ## Dev Stage ##
@@ -36,4 +36,4 @@ FROM base AS dev
 FROM base AS prod
 
 # Run the container as the non-root user 'app'
-USER app
+USER 1234
